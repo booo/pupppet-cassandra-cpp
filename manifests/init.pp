@@ -19,6 +19,11 @@ class cassandra-cpp(
       ensure => installed,
     }
   }
+  if ! defined(Package['git']) {
+    package { 'git':
+      ensure => installed,
+    }
+  }
 
   package { [
     'libssh2-1-dev',
@@ -30,11 +35,12 @@ class cassandra-cpp(
   exec { 'git clone https://github.com/datastax/cpp-driver.git /usr/src/cassandra-cpp':
     path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
     creates => '/usr/src/cassandra-cpp/README.md',
+    require => Package['git'],
   }
   exec { "git checkout ${branch}":
     path     => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
     cwd      => '/usr/src/cassandra-cpp',
-    requires => Exec['git clone https://github.com/datastax/cpp-driver.git /usr/src/cassandra-cpp'],
+    require => Exec['git clone https://github.com/datastax/cpp-driver.git /usr/src/cassandra-cpp'],
   }
 
   #TODO build only once
